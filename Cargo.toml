@@ -1,0 +1,16 @@
+[package]
+name = "auto_props"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+auto_props_proc_macros = { path = "proc-macros" }
+paste = "1.0.14"
+
+[features]
+default = ["impl_with"]
+impl_with = ["auto_props_proc_macros/impl_with"]
+getter_prefix = ["auto_props_proc_macros/getter_prefix"]
+
+[lints]
+workspace = true

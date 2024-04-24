@@ -1,0 +1,19 @@
+[package]
+name = "auto_props_proc_macros"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+include_proc_macro = { path = "../../include_proc_macro" }
+proc_macro_misc_helpers = { path = "../../proc_macro_misc_helpers" }
+syn = "2.0.60"
+proc-macro2 = "1.0.81"
+quote = "1.0.35"
+
+[features]
+default = ["impl_with"]
+impl_with = []
+getter_prefix = []
