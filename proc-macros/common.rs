@@ -1,8 +1,8 @@
 use std::collections::btree_map::OccupiedEntry;
 
 use proc_macro::TokenStream;
-use proc_macro_misc_helpers::parse_utils::{parse_peekables_until, parse_until};
-use proc_macro_misc_helpers::{format_ident_if, quote_if, token_name, unwrap, TokenStream2};
+use ohelpers_proc_macros::parse_utils::{parse_peekables_until, parse_until};
+use ohelpers_proc_macros::{format_ident_if, quote_if, token_name, unwrap, TokenStream2};
 use quote::{format_ident, quote};
 use syn::parse::{Error, Parse, ParseStream};
 use syn::{parse_macro_input, parse_quote, FnArg, ItemFn, Result, ReturnType, Token};
