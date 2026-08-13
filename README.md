@@ -1,7 +1,6 @@
 auto_props
 ============
 [![GitHub Stars](https://img.shields.io/github/stars/orgrinrt/auto_props.svg)](https://github.com/orgrinrt/auto_props/stargazers) 
-![Crates.io Total Downloads](https://img.shields.io/crates/d/auto_props)
 [![GitHub Issues](https://img.shields.io/github/issues/orgrinrt/auto_props.svg)](https://github.com/orgrinrt/auto_props/issues) 
 [![Current Version](https://img.shields.io/badge/version-0.1.0-green.svg)](https://github.com/orgrinrt/auto_props) 
 
