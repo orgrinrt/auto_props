@@ -107,7 +107,7 @@ impl Parse for PropertyDslInput {
     }
 }
 
-#[proc_macro]
+// the `#[proc_macro]` entry point is generated in lib.rs; this is the implementation behind it
 pub fn common(input: TokenStream) -> TokenStream {
     let PropertyDslInput {
         name,
@@ -135,8 +135,15 @@ pub fn common(input: TokenStream) -> TokenStream {
     let where_block = quote_if!(where_clause.is_some(), {
         where #where_clause
     });
+    // the builder takes `self` by value and returns it, which a trait method may only do when
+    // the implementor is sized, so that bound is added to whatever the caller asked for
+    let with_where = if where_clause.is_some() {
+        quote!(where Self: Sized, #where_clause)
+    } else {
+        quote!(where Self: Sized)
+    };
     let with_block = quote_if!(impl_with, {
-        fn #with #func_signature (mut self, value: #value_ty) -> Self #where_block {
+        fn #with #func_signature (mut self, value: #value_ty) -> Self #with_where {
                 self. #setter (value);
                 self
             }
