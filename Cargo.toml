@@ -1,11 +1,19 @@
 [package]
 name = "auto_props"
+authors = ["orgrinrt", "Hiisi Digital"]
 version = "0.1.0"
 edition = "2021"
 description = "A macro for implementing properties, optionally with builder-style methods, for the lazy."
+license = "MPL-2.0"
+readme = "README.md"
+repository = "https://github.com/orgrinrt/auto_props"
+homepage = "https://github.com/orgrinrt/auto_props"
+documentation = "https://docs.rs/auto_props"
+keywords = ["macro", "properties", "builder", "getter", "setter"]
+categories = ["rust-patterns", "development-tools"]
 
 [dependencies]
-auto_props_proc_macros = { path = "proc-macros" }
+auto_props_proc_macros = { path = "proc-macros", version = "0.1.0" }
 paste = "1.0.14"
 
 [features]

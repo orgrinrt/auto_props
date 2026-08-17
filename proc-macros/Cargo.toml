@@ -1,14 +1,22 @@
 [package]
 name = "auto_props_proc_macros"
+authors = ["orgrinrt", "Hiisi Digital"]
 version = "0.1.0"
 edition = "2021"
+description = "The procedural macro implementation behind auto_props"
+license = "MPL-2.0"
+repository = "https://github.com/orgrinrt/auto_props"
+homepage = "https://github.com/orgrinrt/auto_props"
+documentation = "https://docs.rs/auto_props_proc_macros"
+keywords = ["macro", "properties", "builder", "proc-macro"]
+categories = ["rust-patterns", "development-tools::procedural-macro-helpers"]
 
 [lib]
 proc-macro = true
 
 [dependencies]
-include_proc_macro = { git = "https://github.com/orgrinrt/include_proc_macro.git" }
-ohelpers_proc_macros = { git = "https://github.com/orgrinrt/ohelpers_proc_macros.git"}
+include_proc_macro = { git = "https://github.com/orgrinrt/include_proc_macro.git", version = "2.0" }
+ohelpers_proc_macros = { git = "https://github.com/orgrinrt/ohelpers_proc_macros.git", version = "0.1" }
 syn = "2.0.60"
 proc-macro2 = "1.0.81"
 quote = "1.0.35"
