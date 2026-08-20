@@ -1,11 +1,10 @@
 auto_props
 ============
 [![GitHub Stars](https://img.shields.io/github/stars/orgrinrt/auto_props.svg)](https://github.com/orgrinrt/auto_props/stargazers) 
-![Crates.io Total Downloads](https://img.shields.io/crates/d/auto_props)
 [![GitHub Issues](https://img.shields.io/github/issues/orgrinrt/auto_props.svg)](https://github.com/orgrinrt/auto_props/issues) 
-[![Current Version](https://img.shields.io/badge/version-1.0.7-green.svg)](https://github.com/orgrinrt/auto_props) 
+[![Current Version](https://img.shields.io/badge/version-0.1.0-green.svg)](https://github.com/orgrinrt/auto_props) 
 
-A macro to cleanly implement properties, for the lazy.
+A macro for implementing properties, optionally with builder-style methods, for the lazy.
 
 ---
 ## Buy me a coffee
@@ -23,6 +22,6 @@ TODO
 ---
 
 ## License
->You can check out the full license [here](https://github.com/orgrinrt/auto_props/blob/master/LICENSE)
+>You can check out the full license [here](https://github.com/orgrinrt/auto_props/blob/main/LICENSE)
 
 This project is licensed under the terms of the **MIT** license.
