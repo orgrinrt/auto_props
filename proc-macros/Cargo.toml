@@ -15,7 +15,7 @@ categories = ["rust-patterns", "development-tools::procedural-macro-helpers"]
 proc-macro = true
 
 [dependencies]
-include_proc_macro = { git = "https://github.com/orgrinrt/include_proc_macro.git", version = "2.0" }
+include_proc_macro = "2.0"
 ohelpers_proc_macros = { git = "https://github.com/orgrinrt/ohelpers_proc_macros.git", version = "0.1" }
 syn = "2.0.60"
 proc-macro2 = "1.0.81"
