@@ -17,7 +17,44 @@ Whether you use this project, have learned something from it, or just like it, p
 
 ## Usage
 
-TODO
+`property!` writes the accessor surface into a trait. The getter and setter are declarations an
+implementor fills in; the builder-style `with_*` arrives with a body already, and that is the part
+the macro saves you writing.
+
+```rust
+use auto_props::property;
+
+trait Named {
+    property!(name: String);
+}
+
+struct Thing {
+    name: String,
+}
+
+impl Named for Thing {
+    fn name(&self) -> String {
+        self.name.clone()
+    }
+    fn set_name(&mut self, value: String) {
+        self.name = value;
+    }
+}
+
+let mut thing = Thing { name: "before".into() };
+thing.set_name("after".into());
+assert_eq!(thing.name(), "after");
+
+// with_name is generated whole, not declared
+let built = Thing { name: "before".into() }.with_name("built".into());
+assert_eq!(built.name(), "built");
+```
+
+Both assertions were run against the crate rather than written from the macro's name.
+
+The trade is narrow enough to state plainly. You still write the getter and the setter, because only
+the implementor knows how the value is stored. What you stop writing is the consuming `with_*` for
+every field on every type, which is the boilerplate that actually accumulates.
 
 ---
 
