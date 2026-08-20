@@ -56,6 +56,19 @@ The trade is narrow enough to state plainly. You still write the getter and the 
 the implementor knows how the value is stored. What you stop writing is the consuming `with_*` for
 every field on every type, which is the boilerplate that actually accumulates.
 
+## Features
+
+Two, and both change the surface the macro declares, so the example above is written against the
+defaults.
+
+| Feature | Default | What it changes |
+|---|---|---|
+| `impl_with` | on | Emits the consuming `with_*` builder method with a body. Turning it off leaves you the getter and setter only. |
+| `getter_prefix` | off | Names the getter `get_name` rather than `name`. Turning it on means the implementation in the example above no longer satisfies the trait. |
+
+`getter_prefix` is worth being deliberate about: it is not additive. Enabling it renames a method
+every implementor already writes, so it is a choice made once for a crate rather than per call site.
+
 ---
 
 ## License

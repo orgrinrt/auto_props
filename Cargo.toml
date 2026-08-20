@@ -13,7 +13,10 @@ keywords = ["macro", "properties", "builder", "getter", "setter"]
 categories = ["rust-patterns", "development-tools"]
 
 [dependencies]
-auto_props_proc_macros = { path = "proc-macros", version = "0.1.0" }
+# default-features = false, or the feature forwards below cannot turn anything
+# off: the proc-macro crate carries impl_with in its own default set, so
+# depending on that default re-enables it whatever a consumer asks for here.
+auto_props_proc_macros = { path = "proc-macros", version = "0.1.0", default-features = false }
 paste = "1.0.14"
 
 [features]
