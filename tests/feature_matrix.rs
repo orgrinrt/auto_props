@@ -16,12 +16,18 @@ fn check(features: &str) -> (bool, String) {
     command
         .args(["check", "--quiet", "--no-default-features"])
         .current_dir(env!("CARGO_MANIFEST_DIR"))
-        .env("CARGO_TARGET_DIR", concat!(env!("CARGO_MANIFEST_DIR"), "/target/feature-matrix"));
+        .env(
+            "CARGO_TARGET_DIR",
+            concat!(env!("CARGO_MANIFEST_DIR"), "/target/feature-matrix"),
+        );
     if !features.is_empty() {
         command.args(["--features", features]);
     }
     let output = command.output().expect("cargo runs");
-    (output.status.success(), String::from_utf8_lossy(&output.stderr).to_string())
+    (
+        output.status.success(),
+        String::from_utf8_lossy(&output.stderr).to_string(),
+    )
 }
 
 /// Builds a throwaway crate whose body is `body`, against this crate at `features`.
@@ -32,7 +38,11 @@ fn consumer_compiles(name: &str, features: &str, attrs: &str, body: &str) -> (bo
     let features_list = if features.is_empty() {
         String::new()
     } else {
-        features.split(',').map(|f| format!("\"{f}\"")).collect::<Vec<_>>().join(", ")
+        features
+            .split(',')
+            .map(|f| format!("\"{f}\""))
+            .collect::<Vec<_>>()
+            .join(", ")
     };
 
     fs::write(
@@ -64,11 +74,17 @@ features = [{features_list}]
     let output = Command::new(env!("CARGO"))
         .args(["check", "--quiet"])
         .current_dir(&root)
-        .env("CARGO_TARGET_DIR", concat!(env!("CARGO_MANIFEST_DIR"), "/target/consumers/target"))
+        .env(
+            "CARGO_TARGET_DIR",
+            concat!(env!("CARGO_MANIFEST_DIR"), "/target/consumers/target"),
+        )
         .output()
         .expect("cargo runs");
 
-    (output.status.success(), String::from_utf8_lossy(&output.stderr).to_string())
+    (
+        output.status.success(),
+        String::from_utf8_lossy(&output.stderr).to_string(),
+    )
 }
 
 #[test]
@@ -84,7 +100,11 @@ fn every_selection_builds() {
         "no_alloc,impl_with,getter_prefix",
     ] {
         let (ok, err) = check(selection);
-        let label = if selection.is_empty() { "no features" } else { selection };
+        let label = if selection.is_empty() {
+            "no features"
+        } else {
+            selection
+        };
         assert!(ok, "{label} builds:\n{err}");
     }
 }
@@ -102,7 +122,12 @@ pub trait Shape {
 fn a_no_std_consumer_can_declare_a_trait_with_it() {
     // The thing the `no_std` feature exists for, and the only place it can be observed:
     // what `property!` writes lands in the consumer's crate, not in this one.
-    let (ok, err) = consumer_compiles("no_std_consumer", "no_alloc,impl_with", "#![no_std]", EVERY_FORM);
+    let (ok, err) = consumer_compiles(
+        "no_std_consumer",
+        "no_alloc,impl_with",
+        "#![no_std]",
+        EVERY_FORM,
+    );
     assert!(ok, "a `#![no_std]` consumer can declare the trait:\n{err}");
 }
 
@@ -117,7 +142,10 @@ fn that_consumer_really_is_without_std() {
         "pub fn reaches() { let _ = std::vec::Vec::<u8>::new(); }",
     );
     assert!(!ok, "a `#![no_std]` consumer must not reach `std::vec`");
-    assert!(err.contains("std"), "the error is about `std` being absent:\n{err}");
+    assert!(
+        err.contains("std"),
+        "the error is about `std` being absent:\n{err}"
+    );
 }
 
 #[test]
@@ -198,5 +226,9 @@ fn the_crate_depends_on_its_own_proc_macros_and_nothing_else() {
         .map(|line| line.split(['=', ' ']).next().unwrap_or(line))
         .collect();
 
-    assert_eq!(named, ["auto_props_proc_macros"], "the dependency set has changed");
+    assert_eq!(
+        named,
+        ["auto_props_proc_macros"],
+        "the dependency set has changed"
+    );
 }

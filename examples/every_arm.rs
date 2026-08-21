@@ -14,12 +14,15 @@
 //!
 //! Only the first is shorthand for anything: `x: T` is `x: T = _ -> _` written short.
 
+#[cfg(all(feature = "impl_with", not(feature = "getter_prefix")))]
 use auto_props::property;
 
 /// A type worth borrowing rather than cloning, so the borrowed arm is shown doing its job.
 #[derive(Clone, Debug, PartialEq)]
+#[cfg(all(feature = "impl_with", not(feature = "getter_prefix")))]
 struct Blob(Vec<u8>);
 
+#[cfg(all(feature = "impl_with", not(feature = "getter_prefix")))]
 trait Surface {
     // Both sides are the property type.
     property!(count: u32);
@@ -40,6 +43,7 @@ trait Surface {
     property!(title: Into<String>);
 }
 
+#[cfg(all(feature = "impl_with", not(feature = "getter_prefix")))]
 struct Record {
     count: u32,
     payload: Blob,
@@ -47,6 +51,7 @@ struct Record {
     title: String,
 }
 
+#[cfg(all(feature = "impl_with", not(feature = "getter_prefix")))]
 impl Surface for Record {
     fn count(&self) -> u32 {
         self.count
@@ -89,6 +94,7 @@ impl Surface for Record {
     }
 }
 
+#[cfg(all(feature = "impl_with", not(feature = "getter_prefix")))]
 fn new_record() -> Record {
     Record {
         count: 0,
@@ -98,6 +104,18 @@ fn new_record() -> Record {
     }
 }
 
+// Written against the default selection. `getter_prefix` renames every getter to `get_*` and
+// `impl_with` is what writes the `with_*` builder at all, so under either change the code
+// below names methods the trait does not declare. cargo builds every example under every
+// feature selection, so the gate is here; `tests/feature_matrix.rs` covers the other
+// selections, and an example showing all of them would be showing the features rather than
+// the macro.
+#[cfg(any(not(feature = "impl_with"), feature = "getter_prefix"))]
+fn main() {
+    println!("this example is written against the default getter naming");
+}
+
+#[cfg(all(feature = "impl_with", not(feature = "getter_prefix")))]
 fn main() {
     let mut record = new_record();
 
@@ -107,7 +125,11 @@ fn main() {
     // The setter borrows, so the blob is still the caller's afterwards.
     let blob = Blob(vec![1, 2, 3]);
     record.set_payload(&blob);
-    println!("payload: {:?} (and the caller still has {:?})", record.payload(), blob);
+    println!(
+        "payload: {:?} (and the caller still has {:?})",
+        record.payload(),
+        blob
+    );
 
     record.set_label(String::from("shipped"));
     println!("label:   {:?}", record.label());

@@ -4,6 +4,14 @@
 //! that comes with a body. What varies between arms is how the setter's parameter type and
 //! the getter's return type are derived from the property type, which the specification
 //! writes as `<param> -> <return>` with `_` standing for the property type in each.
+//!
+//! Written against the default naming. `getter_prefix` renames every getter to `get_*` and
+//! `impl_with` is what writes the `with_*` builder at all, so under either change these
+//! implementations would name methods the trait does not declare, and cargo builds a
+//! test under whatever selection it is given. The whole file is gated rather than each impl,
+//! because the naming is what the file is about; `tests/feature_matrix.rs` covers the
+//! prefixed form.
+#![cfg(all(feature = "impl_with", not(feature = "getter_prefix")))]
 
 use auto_props::property;
 
