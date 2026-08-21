@@ -16,7 +16,11 @@ proc-macro = true
 
 [dependencies]
 include_proc_macro = "2.0"
-ohelpers_proc_macros = { git = "https://github.com/orgrinrt/ohelpers_proc_macros.git", version = "0.1" }
+# Tracks `dev`, like every other cross-repo git dependency here. Without a branch it tracked
+# `main`, whose manifest still requires derive_display 0.0.4 against a derive_display `main`
+# carrying 0.0.5, so a fresh resolve could not pick a version and this crate's suite was red
+# for a reason that had nothing to do with it.
+ohelpers_proc_macros = { git = "https://github.com/orgrinrt/ohelpers_proc_macros.git", branch = "dev", version = "0.1" }
 syn = "2.0.60"
 proc-macro2 = "1.0.81"
 quote = "1.0.35"

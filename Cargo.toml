@@ -17,9 +17,20 @@ categories = ["rust-patterns", "development-tools"]
 # off: the proc-macro crate carries impl_with in its own default set, so
 # depending on that default re-enables it whatever a consumer asks for here.
 auto_props_proc_macros = { path = "proc-macros", version = "0.1.0", default-features = false }
-paste = "1.0.14"
 
 [features]
 default = ["impl_with"]
 impl_with = ["auto_props_proc_macros/impl_with"]
 getter_prefix = ["auto_props_proc_macros/getter_prefix"]
+# Neither changes what this crate does. It is `macro_rules!` forwarding to a proc macro,
+# and what that proc macro writes is trait method declarations naming only the types the
+# caller named, so nothing it produces reaches for `std` or an allocator on its own
+# account. The features exist so a consumer whose workspace turns them on everywhere can
+# name them, and so the claim is checked: `tests/feature_matrix.rs` compiles a `#![no_std]`
+# consumer whose trait is built out of `property!`.
+#
+# The proc-macro crate is deliberately not carried along. It runs on the host inside the
+# compiler, where syn, quote and proc-macro2 all use `std`, so it cannot be `no_std`
+# whatever this crate declares.
+no_std = []
+no_alloc = ["no_std"]
