@@ -1,11 +1,83 @@
-use std::collections::btree_map::OccupiedEntry;
-
+use ohelpers_proc_macros::parse_utils::parse_peekables_until;
+use ohelpers_proc_macros::{format_ident_if, quote_if, unwrap, TokenStream2};
 use proc_macro::TokenStream;
-use ohelpers_proc_macros::parse_utils::{parse_peekables_until, parse_until};
-use ohelpers_proc_macros::{format_ident_if, quote_if, token_name, unwrap, TokenStream2};
 use quote::{format_ident, quote};
-use syn::parse::{Error, Parse, ParseStream};
-use syn::{parse_macro_input, parse_quote, FnArg, ItemFn, Result, ReturnType, Token};
+use syn::parse::{Parse, ParseStream};
+use syn::{parse_macro_input, parse_quote, Result, Token};
+
+/// The type `Into<T>` names, when that is what the property was declared as.
+///
+/// This used to be `ty_name.starts_with("Into")` over the type's printed form, followed by
+/// `replace("Into", "")` and stripping every angle bracket. Three things went wrong with
+/// that. A user type named `IntoThing` was silently rewritten to `Thing`, and so would
+/// `IntoIterator` be. A nested argument such as `Into<Vec<u8>>` lost its inner brackets and
+/// left `Vec u8`, which does not parse, so the macro panicked. And `Into<IntoThing>` had
+/// both occurrences of `Into` removed, because `replace` is not `strip_prefix`.
+///
+/// Matching the parsed type instead: a path whose last segment is exactly `Into` and which
+/// carries exactly one type argument.
+fn into_argument(ty: &syn::Type) -> Option<syn::Type> {
+    let syn::Type::Path(type_path) = strip_groups(ty) else {
+        return None;
+    };
+    if type_path.qself.is_some() {
+        return None;
+    }
+
+    let segment = type_path.path.segments.last()?;
+    if segment.ident != "Into" {
+        return None;
+    }
+
+    let syn::PathArguments::AngleBracketed(arguments) = &segment.arguments else {
+        return None;
+    };
+    if arguments.args.len() != 1 {
+        return None;
+    }
+
+    match arguments.args.first()? {
+        syn::GenericArgument::Type(inner) => Some(inner.clone()),
+        _ => None,
+    }
+}
+
+/// Looks through the invisible grouping a `$ty:ty` fragment arrives inside.
+///
+/// A matcher fragment reaches a proc macro wrapped in a `None`-delimited group, which syn
+/// represents as `Type::Group`, so matching on `Type::Path` directly never fires for a type
+/// that came from a `macro_rules` capture. Printing the type saw through it, which is why
+/// the string version appeared to work.
+fn strip_groups(ty: &syn::Type) -> &syn::Type {
+    let mut current = ty;
+    loop {
+        current = match current {
+            syn::Type::Group(group) => &group.elem,
+            syn::Type::Paren(paren) => &paren.elem,
+            other => return other,
+        };
+    }
+}
+
+/// Whether a standalone `_` placeholder comes before the end of the return specification.
+///
+/// This used to ask whether the remaining stream's printed form contained an underscore
+/// anywhere, which is true of any identifier carrying one, so a return type spelled
+/// `Bar_Baz` took the placeholder branch and was assembled as a prefix and a postfix around
+/// the property type. A `_` placeholder is its own token; an identifier containing an
+/// underscore is a single `Ident` token and is not one.
+fn has_placeholder(input: ParseStream) -> bool {
+    let fork = input.fork();
+    while !fork.is_empty() {
+        if fork.peek(Token![_]) {
+            return true;
+        }
+        if fork.parse::<proc_macro2::TokenTree>().is_err() {
+            return false;
+        }
+    }
+    false
+}
 
 struct PropertyDslInput {
     name:              syn::Ident,
@@ -16,8 +88,6 @@ struct PropertyDslInput {
     impl_with:         bool,
     param_prefix:      TokenStream2,
     param_postfix:     TokenStream2,
-    ret_prefix:        TokenStream2,
-    ret_postfix:       TokenStream2,
     where_clause:      Option<TokenStream2>,
 }
 
@@ -30,47 +100,33 @@ impl Parse for PropertyDslInput {
             .parse::<Token![:]>()
             .expect("Expected : token after property name");
         let mut ty: syn::Type = input.parse().expect("Expected a type after property name");
-        let ty_name: String = token_name!(parsable ty ty);
-        let is_into_variant = ty_name.starts_with("Into");
-        if is_into_variant {
-            let ty_name_inner = ty_name
-                .replace("Into", "")
-                .replace("<", "")
-                .replace(">", "");
-            ty = syn::parse_str::<syn::Type>(ty_name_inner.as_str()).expect(
-                format!(
-                    "Expected inner to be valid type, but got `{}`",
-                    ty_name_inner
-                )
-                .as_str(),
-            );
-        }
+        let is_into_variant = match into_argument(&ty) {
+            Some(inner) => {
+                ty = inner;
+                true
+            },
+            None => false,
+        };
         input.parse::<Token![=]>()?;
         let param_prefix = parse_peekables_until(input, Token![_]).ok();
         let _: Token![_] = input.parse()?;
         let param_postfix = parse_peekables_until(input, Token![->]).ok();
         input.parse::<Token![->]>().expect("Expected the -> token");
-        let mut ret_prefix: TokenStream2 = TokenStream2::new();
-        let mut ret_postfix: TokenStream2 = TokenStream2::new();
-        let mut return_type: Option<syn::Type> = None;
-        if input.to_string().contains("_") {
-            ret_prefix = parse_peekables_until(input, Token![_]).expect(
-                "Expected the type \
-            placeholder token in the correct place",
-            );
+        // The return specification is either a `_` placeholder with optional tokens around
+        // it, which is assembled around the property type, or a type written out in full.
+        let return_type: Option<syn::Type> = if has_placeholder(input) {
+            let ret_prefix = parse_peekables_until(input, Token![_])
+                .expect("Expected the type placeholder token in the correct place");
             let _: Token![_] = input.parse()?;
-            let maybe_ret_postfix = parse_peekables_until(input, Token![where]).ok();
-            if let Some(postfix) = maybe_ret_postfix {
-                ret_postfix = postfix;
-            }
-            return_type = Some(parse_quote!(#ret_prefix #ty #ret_postfix));
+            let ret_postfix =
+                parse_peekables_until(input, Token![where]).unwrap_or_default();
+            Some(parse_quote!(#ret_prefix #ty #ret_postfix))
         } else {
-            return_type = input.parse().ok();
-        }
+            input.parse().ok()
+        };
         let mut where_clause: Option<TokenStream2> = None;
         if !input.is_empty() {
-            let w: Option<Token![where]> = input.parse().ok();
-            if let Some(w) = w {
+            if input.parse::<Token![where]>().is_ok() {
                 let body;
                 unwrap!(braces body in input);
                 let body_stream: TokenStream2 = body.parse().expect(
@@ -100,8 +156,6 @@ impl Parse for PropertyDslInput {
             impl_with,
             param_prefix: quote_if!(some param_prefix),
             param_postfix: quote_if!(some param_postfix),
-            ret_prefix,
-            ret_postfix,
             where_clause,
         })
     }
@@ -118,8 +172,6 @@ pub fn common(input: TokenStream) -> TokenStream {
         impl_with,
         param_prefix,
         param_postfix,
-        ret_prefix,
-        ret_postfix,
         where_clause,
     } = parse_macro_input!(input as PropertyDslInput);
     let setter = format_ident!("set_{}", name);
