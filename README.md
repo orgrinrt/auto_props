@@ -1,19 +1,32 @@
-auto_props
-============
-[![GitHub Stars](https://img.shields.io/github/stars/orgrinrt/auto_props.svg)](https://github.com/orgrinrt/auto_props/stargazers) 
-[![GitHub Issues](https://img.shields.io/github/issues/orgrinrt/auto_props.svg)](https://github.com/orgrinrt/auto_props/issues) 
-[![Current Version](https://img.shields.io/badge/version-0.1.0-green.svg)](https://github.com/orgrinrt/auto_props) 
+# `auto_props`
 
-A macro for implementing properties, optionally with builder-style methods, for the lazy.
+<div align="center" style="text-align: center;">
 
----
-## Buy me a coffee
+[![GitHub Stars](https://img.shields.io/github/stars/orgrinrt/auto_props.svg)](https://github.com/orgrinrt/auto_props/stargazers)
+[![Crates.io](https://img.shields.io/crates/v/auto_props)](https://crates.io/crates/auto_props)
+[![docs.rs](https://img.shields.io/docsrs/auto_props)](https://docs.rs/auto_props)
+[![GitHub Issues](https://img.shields.io/github/issues/orgrinrt/auto_props.svg)](https://github.com/orgrinrt/auto_props/issues)
+![License](https://img.shields.io/github/license/orgrinrt/auto_props?color=%23009689)
 
-Whether you use this project, have learned something from it, or just like it, please consider supporting it by buying me a coffee, so I can dedicate more time on open-source projects like this :)
+> A macro for implementing properties, optionally with builder-style methods, for the lazy.
 
-<a href="https://buymeacoffee.com/orgrinrt" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+</div>
 
----
+## Installation
+
+Not published yet, so this does not resolve. It is the command once a release
+lands.
+
+```bash
+cargo add auto_props
+```
+
+Or in `Cargo.toml`:
+
+```toml
+[dependencies]
+auto_props = "0.1"
+```
 
 ## Usage
 
@@ -69,9 +82,16 @@ defaults.
 `getter_prefix` is worth being deliberate about: it is not additive. Enabling it renames a method
 every implementor already writes, so it is a choice made once for a crate rather than per call site.
 
----
+## Support
+
+Whether you use this project, have learned something from it, or just like it, please consider supporting it by buying me a coffee, so I can dedicate more time on open-source projects like this :)
+
+<a href="https://buymeacoffee.com/orgrinrt" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
 
 ## License
->You can check out the full license [here](https://github.com/orgrinrt/auto_props/blob/main/LICENSE)
 
-This project is licensed under the terms of the **MPL-2.0** license.
+> The project is licensed under the **Mozilla Public License 2.0**.
+
+`SPDX-License-Identifier: MPL-2.0`
+
+> You can check out the full license [here](https://github.com/orgrinrt/auto_props/blob/dev/LICENSE)
