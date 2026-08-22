@@ -1,6 +1,5 @@
 [package]
 name = "auto_props"
-authors = ["orgrinrt", "Hiisi Digital"]
 version = "0.1.0"
 edition = "2021"
 description = "A macro for implementing properties, optionally with builder-style methods, for the lazy."
@@ -10,6 +9,7 @@ repository = "https://github.com/orgrinrt/auto_props"
 homepage = "https://github.com/orgrinrt/auto_props"
 documentation = "https://docs.rs/auto_props"
 keywords = ["macro", "properties", "builder", "getter", "setter"]
+exclude = [".idea/", "target/"]
 categories = ["rust-patterns", "development-tools"]
 
 [dependencies]

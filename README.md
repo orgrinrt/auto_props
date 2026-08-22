@@ -12,6 +12,22 @@
 
 </div>
 
+## Installation
+
+Not published yet, so this does not resolve. It is the command once a release
+lands.
+
+```bash
+cargo add auto_props
+```
+
+Or in `Cargo.toml`:
+
+```toml
+[dependencies]
+auto_props = "0.1"
+```
+
 ## Usage
 
 `property!` writes the accessor surface into a trait. The getter and setter are declarations an

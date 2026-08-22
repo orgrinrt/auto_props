@@ -1,6 +1,5 @@
 [package]
 name = "auto_props_proc_macros"
-authors = ["orgrinrt", "Hiisi Digital"]
 version = "0.1.0"
 edition = "2021"
 description = "The procedural macro implementation behind auto_props"
